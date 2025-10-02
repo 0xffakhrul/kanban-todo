@@ -1,0 +1,38 @@
+# Bun-specific files
+bun.lockb
+.bun/
+
+# Node.js dependencies (if also used or for compatibility)
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+bun-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build artifacts
+dist/
+build/
+out/
+
+# IDE and OS-specific files
+.DS_Store
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Test coverage
+coverage/
+
+# Misc
+tmp/
