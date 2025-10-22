@@ -38,7 +38,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd ~/usr/src/app
+            cd ~/app
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/kanban-backend:latest
             docker compose -f docker-compose.prod.yml up -d backend
             docker image prune -f
