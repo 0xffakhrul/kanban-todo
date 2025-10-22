@@ -11,7 +11,7 @@ import {
   createTodoRoutes,
 } from "./routes/routes";
 import { AuthService } from "./services/auth.service";
-import { UserRespository } from "./repositories/user.repository";
+import { UserRepository } from "./repositories/user.repository";
 import { AuthController } from "./controllers/auth.controller";
 import { createAuthMiddleware } from "./middleware/auth.middleware";
 import { cors } from "hono/cors";
@@ -30,7 +30,7 @@ app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
-const userRepository = new UserRespository();
+const userRepository = new UserRepository();
 const statusRepository = new StatusRepository();
 const todoRepository = new TodoRepository();
 
@@ -44,14 +44,14 @@ const todoController = new TodoController(todoService);
 
 const authMiddleware = createAuthMiddleware(authService);
 
-app.route("/api/v1/auth", createAuthRoutes(authController));
+app.route("/api/v1/auth", createAuthRoutes(authController, authService));
 
-app.use("/api/v1/statuses/*", authMiddleware);
-app.use("/api/v1/todos/*", authMiddleware);
-app.use("/api/v1/auth/me", authMiddleware);
 
 // Register routes
-app.route("/api/v1/statuses", createStatusRoutes(statusController));
-app.route("/api/v1/todos", createTodoRoutes(todoController));
+app.route(
+  "/api/v1/statuses",
+  createStatusRoutes(statusController, authService)
+);
+app.route("/api/v1/todos", createTodoRoutes(todoController, authService));
 
 export default app;

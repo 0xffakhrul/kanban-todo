@@ -3,7 +3,7 @@ import { db } from "../db/connection";
 import { users } from "../db/schema";
 import { User } from "../types/types";
 
-export class UserRespository {
+export class UserRepository {
   async create(
     email: string,
     hashedPassword: string,
