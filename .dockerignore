@@ -1,0 +1,32 @@
+# Node dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build artifacts
+dist
+build
+*.log
+
+# Git files
+.git
+.gitignore
+
+# Environment files
+.env
+.env.*
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode
+.idea
+
+# Docker-related
+Dockerfile*
+docker-compose*
+
+# Tests and docs (optional)
+tests
+__tests__
+docs
