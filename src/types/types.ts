@@ -1,3 +1,10 @@
+export interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  createdAt: Date;
+}
+
 export interface Status {
   id: string;
   name: string;
@@ -17,6 +24,22 @@ export interface Todo {
 
 export interface TodoWithStatus extends Todo {
   status: Status;
+}
+
+export interface RegisterInput {
+  email: string;
+  name: string;
+  password: string;
+}
+
+export interface LoginInput {
+  email: string;
+  password: string
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
 }
 
 export interface CreateStatusInput {
