@@ -15,16 +15,23 @@ import { UserRepository } from "./repositories/user.repository";
 import { AuthController } from "./controllers/auth.controller";
 import { createAuthMiddleware } from "./middleware/auth.middleware";
 import { cors } from "hono/cors";
+import { serve } from "bun";
 
 const app = new Hono();
 
 app.use(
   "/*",
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://localhost:3002",
     credentials: true,
   })
 );
+
+serve({
+  fetch: app.fetch,
+  port: 3010,
+  hostname: "0.0.0.0", 
+});
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");
@@ -45,7 +52,6 @@ const todoController = new TodoController(todoService);
 const authMiddleware = createAuthMiddleware(authService);
 
 app.route("/api/v1/auth", createAuthRoutes(authController, authService));
-
 
 // Register routes
 app.route(
