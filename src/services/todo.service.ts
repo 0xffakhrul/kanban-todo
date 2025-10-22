@@ -26,4 +26,8 @@ export class TodoService {
 
     return todoWithStatus!;
   }
+
+  async getTodosByUser(userId: string): Promise<TodoWithStatus[]> {
+    return this.todoRepo.findByUserWithStatus(userId);
+  }
 }

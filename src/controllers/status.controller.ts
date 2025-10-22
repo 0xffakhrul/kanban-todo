@@ -2,6 +2,7 @@ import { Context } from "hono";
 import { StatusService } from "../services/status.service";
 import { createStatusSchema } from "../validators/zod-validators";
 import z from "zod";
+import { HTTPException } from "hono/http-exception";
 
 export class StatusController {
   constructor(private statusService: StatusService) {}
@@ -24,16 +25,22 @@ export class StatusController {
           400
         );
       }
+
+      if (error instanceof HTTPException) {
+        return c.json({ error: error.message }, error.status);
+      }
+
       return c.json({ error: (error as Error).message }, 400);
     }
   }
 
-  //   async list(c: Context) {
-  //     try {
-  //         const userId = c.get('userId');
-  //         const statuses = await this.statusService
-  //     } catch (error) {
-
-  //     }
-  //   }
+  async list(c: Context) {
+    try {
+      const userId = c.get("userId");
+      const statuses = await this.statusService.getAllStatusesByUserId(userId);
+      return c.json(statuses, 200);
+    } catch (error) {
+      return c.json({ error: (error as Error).message }, 400);
+    }
+  }
 }

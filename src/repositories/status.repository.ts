@@ -40,13 +40,22 @@ export class StatusRepository {
     await db.delete(statuses).where(eq(statuses.id, id));
   }
 
-  async existsForUser(id: string, userId: string): Promise<boolean> {
+  async existsByNameForUser(name: string, userId: string): Promise<boolean> {
     const [status] = await db
       .select()
       .from(statuses)
-      .where(and(eq(statuses.id, id), eq(statuses.userId, userId)))
+      .where(and(eq(statuses.name, name), eq(statuses.userId, userId)))
       .limit(1);
 
     return !!status;
+  }
+
+  async findByUserId(userId: string): Promise<Status[]> {
+    const results = await db
+      .select()
+      .from(statuses)
+      .where(eq(statuses.userId, userId));
+
+    return results as Status[];
   }
 }

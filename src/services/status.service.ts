@@ -1,6 +1,7 @@
 import { StatusRepository } from "../repositories/status.repository";
 import { TodoRepository } from "../repositories/todo.repository";
 import { CreateStatusInput, Status, UpdateStatusInput } from "../types/types";
+import { HTTPException } from "hono/http-exception";
 
 export class StatusService {
   constructor(
@@ -9,6 +10,12 @@ export class StatusService {
   ) {}
 
   async createStatus(userId: string, name: string): Promise<Status> {
+    const exists = await this.statusRepo.existsByNameForUser(name, userId);
+
+    if (exists) {
+      throw new HTTPException(409, { message: "status name already exists" });
+    }
+
     const data: CreateStatusInput = {
       userId,
       name: name.trim(),
@@ -49,5 +56,9 @@ export class StatusService {
     await this.getStatusById(id, userId);
 
     await this.statusRepo.delete(id);
+  }
+
+  async getAllStatusesByUserId(userId: string): Promise<Status[]> {
+    return await this.statusRepo.findByUserId(userId);
   }
 }

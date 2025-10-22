@@ -1,7 +1,12 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db/connection";
 import { statuses, todos } from "../db/schema";
-import { CreateTodoInput, Todo, TodoWithStatus, UpdateTodoInput } from "../types/types";
+import {
+  CreateTodoInput,
+  Todo,
+  TodoWithStatus,
+  UpdateTodoInput,
+} from "../types/types";
 
 export class TodoRepository {
   async create(data: CreateTodoInput): Promise<Todo> {
@@ -55,6 +60,19 @@ export class TodoRepository {
       ...result.todos,
       status: result.statuses!,
     } as TodoWithStatus;
+  }
+
+  async findByUserWithStatus(userId: string): Promise<TodoWithStatus[]> {
+    const results = await db
+      .select()
+      .from(todos)
+      .leftJoin(statuses, eq(todos.statusId, statuses.id))
+      .where(eq(todos.userId, userId));
+
+    return results.map((result) => ({
+      ...result.todos,
+      status: result.statuses!,
+    })) as TodoWithStatus[];
   }
 
   async delete(id: string): Promise<void> {

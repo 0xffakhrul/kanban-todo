@@ -29,4 +29,14 @@ export class TodoController {
       return c.json({ error: (error as Error).message }, 400);
     }
   }
+
+  async list(c: Context) {
+    try {
+      const userId = c.get("userId");
+      const todos = await this.todoService.getTodosByUser(userId);
+      return c.json(todos);
+    } catch (error) {
+      return c.json({ error: (error as Error).message }, 400);
+    }
+  }
 }
