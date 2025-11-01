@@ -43,10 +43,11 @@ export function createTodoRoutes(
 ) {
   const routes = new Hono();
 
-  routes.use("/", createAuthMiddleware(authService));
+  routes.use("*", createAuthMiddleware(authService));
 
   routes.get("/", (c) => todoController.list(c));
   routes.post("/", (c) => todoController.create(c));
+  routes.put("/:id", (c) => todoController.update(c));
 
   return routes;
 }

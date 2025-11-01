@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "../db/connection";
 import { statuses, todos } from "../db/schema";
 import {
@@ -23,15 +23,23 @@ export class TodoRepository {
     return todo as Todo;
   }
 
-  async update(id: string, data: UpdateTodoInput): Promise<Todo> {
+  async update(
+    id: string,
+    userId: string,
+    data: UpdateTodoInput
+  ): Promise<Todo> {
     const [updated] = await db
       .update(todos)
       .set({
         ...data,
         updatedAt: new Date(),
       })
-      .where(eq(todos.id, id))
+      .where(and(eq(todos.id, id), eq(todos.userId, userId)))
       .returning();
+
+    if (!updated) {
+      throw new Error("Todo not found or unauthorized");
+    }
 
     return updated as Todo;
   }

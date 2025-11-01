@@ -61,6 +61,6 @@ export interface CreateTodoInput {
 
 export interface UpdateTodoInput {
   title?: string;
-  description?: string;
+  description?: string | null;
   statusId?: string;
 }

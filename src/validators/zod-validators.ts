@@ -22,12 +22,12 @@ export const updateStatusSchema = z.object({
 
 export const createTodoSchema = z.object({
   title: z.string().min(3).max(50),
-  description: z.string().min(1).max(500).optional(),
+  description: z.string().min(1).max(500).nullable().optional(),
   statusId: z.uuid("Invalid status ID"),
 });
 
 export const updateTodoSchema = z.object({
   title: z.string().min(3).max(50).optional(),
-  description: z.string().max(500).optional(),
+  description: z.string().max(500).nullable().optional(),  
   statusId: z.uuid("Invalid status ID").optional(),
 });
