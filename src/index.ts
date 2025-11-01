@@ -22,16 +22,24 @@ const app = new Hono();
 app.use(
   "/*",
   cors({
-    origin: "http://localhost:3002",
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
 
-serve({
-  fetch: app.fetch,
-  port: 3010,
-  hostname: "0.0.0.0", 
-});
+// app.use(
+//   "/*",
+//   cors({
+//     origin: "http://localhost:3000",
+//     credentials: true,
+//   })
+// );
+
+// serve({
+//   fetch: app.fetch,
+//   port: 3000,
+//   hostname: "0.0.0.0",
+// });
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");
