@@ -1,21 +1,24 @@
 import { Hono } from "hono";
 import { StatusRepository } from "./repositories/status.repository";
 import { TodoRepository } from "./repositories/todo.repository";
+import { BoardRepository } from "./repositories/board.repository";
+import { UserRepository } from "./repositories/user.repository";
 import { StatusService } from "./services/status.service";
 import { TodoService } from "./services/todo.service";
+import { BoardService } from "./services/board.service";
+import { AuthService } from "./services/auth.service";
 import { StatusController } from "./controllers/status.controller";
 import { TodoController } from "./controllers/todo.controller";
+import { BoardController } from "./controllers/board.controller";
+import { AuthController } from "./controllers/auth.controller";
 import {
   createAuthRoutes,
+  createBoardRoutes,
   createStatusRoutes,
   createTodoRoutes,
 } from "./routes/routes";
-import { AuthService } from "./services/auth.service";
-import { UserRepository } from "./repositories/user.repository";
-import { AuthController } from "./controllers/auth.controller";
 import { createAuthMiddleware } from "./middleware/auth.middleware";
 import { cors } from "hono/cors";
-import { serve } from "bun";
 
 const app = new Hono();
 
@@ -27,45 +30,36 @@ app.use(
   })
 );
 
-// app.use(
-//   "/*",
-//   cors({
-//     origin: "http://localhost:3000",
-//     credentials: true,
-//   })
-// );
-
-// serve({
-//   fetch: app.fetch,
-//   port: 3000,
-//   hostname: "0.0.0.0",
-// });
-
 app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
 const userRepository = new UserRepository();
+const boardRepository = new BoardRepository();
 const statusRepository = new StatusRepository();
 const todoRepository = new TodoRepository();
 
 const authService = new AuthService(userRepository);
-const statusService = new StatusService(statusRepository, todoRepository);
-const todoService = new TodoService(todoRepository, statusRepository);
+const boardService = new BoardService(boardRepository);
+const statusService = new StatusService(
+  statusRepository,
+  todoRepository,
+  boardRepository
+);
+const todoService = new TodoService(
+  todoRepository,
+  statusRepository,
+  boardRepository
+);
 
 const authController = new AuthController(authService);
+const boardController = new BoardController(boardService);
 const statusController = new StatusController(statusService);
 const todoController = new TodoController(todoService);
 
-const authMiddleware = createAuthMiddleware(authService);
-
-app.route("/api/v1/auth", createAuthRoutes(authController, authService));
-
 // Register routes
-app.route(
-  "/api/v1/statuses",
-  createStatusRoutes(statusController, authService)
-);
-app.route("/api/v1/todos", createTodoRoutes(todoController, authService));
-
+app.route("/api/v1/auth", createAuthRoutes(authController, authService));
+app.route("/api/v1/boards", createBoardRoutes(boardController, authService));
+app.route("/api/v1", createStatusRoutes(statusController, authService));
+app.route("/api/v1", createTodoRoutes(todoController, authService)); 
 export default app;

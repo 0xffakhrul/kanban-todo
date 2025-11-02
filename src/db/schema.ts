@@ -15,9 +15,22 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const boards = pgTable("boards", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 50 }).notNull(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id),
+  icon: varchar("icon", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const statuses = pgTable("statuses", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 50 }).notNull(),
+  boardId: uuid("board_id")
+    .notNull()
+    .references(() => boards.id),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id),
@@ -28,6 +41,9 @@ export const todos = pgTable("todos", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: varchar("title", { length: 100 }).notNull(),
   description: text("description"),
+  boardId: uuid("board_id")
+    .notNull()
+    .references(() => boards.id),
   statusId: uuid("status_id")
     .notNull()
     .references(() => statuses.id),
