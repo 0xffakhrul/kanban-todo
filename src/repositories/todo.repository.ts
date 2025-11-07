@@ -15,6 +15,7 @@ export class TodoRepository {
       .values({
         title: data.title,
         description: data.description || null,
+        boardId: data.boardId,
         statusId: data.statusId,
         userId: data.userId,
       })
@@ -68,6 +69,19 @@ export class TodoRepository {
       ...result.todos,
       status: result.statuses!,
     } as TodoWithStatus;
+  }
+
+  async findByBoardWithStatus(boardId: string): Promise<TodoWithStatus[]> {
+    const results = await db
+      .select()
+      .from(todos)
+      .leftJoin(statuses, eq(todos.statusId, statuses.id))
+      .where(eq(todos.boardId, boardId));
+
+    return results.map((result) => ({
+      ...result.todos,
+      status: result.statuses!,
+    })) as TodoWithStatus[];
   }
 
   async findByUserWithStatus(userId: string): Promise<TodoWithStatus[]> {

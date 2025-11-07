@@ -30,7 +30,13 @@ export class AuthController {
         path: "/",
       });
 
-      return c.json({ user: result.user }, 201);
+      return c.json(
+        {
+          success: true,
+          data: { user: result.user },
+        },
+        201
+      );
     } catch (error) {
       if (error instanceof z.ZodError) {
         return c.json(
@@ -65,7 +71,10 @@ export class AuthController {
         path: "/",
       });
 
-      return c.json({ user: result.user });
+      return c.json({
+        success: true,
+        data: { user: result.user },
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return c.json(
@@ -115,7 +124,10 @@ export class AuthController {
       const userId = c.get("userId");
       const user = await this.authService.getCurrentUser(userId);
 
-      return c.json({ user });
+      return c.json({
+        success: true,
+        data: { user },
+      });
     } catch (error) {
       return c.json({ error: (error as Error).message }, 404);
     }

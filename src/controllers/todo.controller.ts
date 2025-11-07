@@ -5,6 +5,7 @@ import {
   updateTodoSchema,
 } from "../validators/zod-validators";
 import z from "zod";
+import { HTTPException } from "hono/http-exception";
 
 export class TodoController {
   constructor(private todoService: TodoService) {}
@@ -12,58 +13,109 @@ export class TodoController {
   async create(c: Context) {
     try {
       const userId = c.get("userId");
+      const { boardId } = c.req.param(); 
       const body = await c.req.json();
       const validatedData = createTodoSchema.parse(body);
 
       const todo = await this.todoService.createTodo(
         userId,
-        validatedData.title,
+        boardId,
         validatedData.statusId,
+        validatedData.title,
         validatedData.description || undefined
       );
-      return c.json(todo, 201);
+
+      return c.json(
+        {
+          success: true,
+          data: todo,
+        },
+        201
+      );
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return c.json(
-          { error: "Validation failed", details: error.issues },
-          400
-        );
+        throw new HTTPException(400, {
+          message: "Validation failed",
+          cause: error.issues,
+        });
       }
-      return c.json({ error: (error as Error).message }, 400);
+      if (error instanceof HTTPException) {
+        throw error;
+      }
+      console.error("Error creating todo:", error);
+      throw new HTTPException(500, { message: "Failed to create todo" });
     }
   }
 
   async update(c: Context) {
     try {
       const userId = c.get("userId");
-      const todoId = c.req.param("id");
+      const { id } = c.req.param();
       const body = await c.req.json();
       const validatedData = updateTodoSchema.parse(body);
 
       const todo = await this.todoService.updateTodo(
-        todoId,
+        id,
         userId,
         validatedData
       );
-      return c.json(todo);
+
+      return c.json({
+        success: true,
+        data: todo,
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return c.json(
-          { error: "Validation failed", details: error.issues },
-          400
-        );
+        throw new HTTPException(400, {
+          message: "Validation failed",
+          cause: error.issues,
+        });
       }
-      return c.json({ error: (error as Error).message }, 400);
+      if (error instanceof HTTPException) {
+        throw error;
+      }
+      console.error("Error updating todo:", error);
+      throw new HTTPException(500, { message: "Failed to update todo" });
     }
   }
 
-  async list(c: Context) {
+  async delete(c: Context) {
     try {
       const userId = c.get("userId");
-      const todos = await this.todoService.getTodosByUser(userId);
-      return c.json(todos);
+      const { id } = c.req.param();
+
+      await this.todoService.deleteTodo(id, userId);
+
+      return c.json({
+        success: true,
+        message: "Todo deleted successfully",
+      });
     } catch (error) {
-      return c.json({ error: (error as Error).message }, 400);
+      if (error instanceof HTTPException) {
+        throw error;
+      }
+      console.error("Error deleting todo:", error);
+      throw new HTTPException(500, { message: "Failed to delete todo" });
+    }
+  }
+
+  async listByBoard(c: Context) {
+    try {
+      const userId = c.get("userId");
+      const boardId = c.req.param("boardId");
+
+      const todos = await this.todoService.getTodosByBoard(boardId, userId);
+
+      return c.json({
+        success: true,
+        data: todos,
+      });
+    } catch (error) {
+      if (error instanceof HTTPException) {
+        throw error;
+      }
+      console.error("Error fetching todos:", error);
+      throw new HTTPException(500, { message: "Failed to fetch todos" });
     }
   }
 }

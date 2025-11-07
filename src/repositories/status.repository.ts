@@ -9,10 +9,10 @@ export class StatusRepository {
       .insert(statuses)
       .values({
         name: data.name,
+        boardId: data.boardId,
         userId: data.userId,
       })
       .returning();
-
     return status as Status;
   }
 
@@ -22,7 +22,6 @@ export class StatusRepository {
       .from(statuses)
       .where(eq(statuses.id, id))
       .limit(1);
-
     return (status as Status) || null;
   }
 
@@ -32,7 +31,6 @@ export class StatusRepository {
       .set(data)
       .where(eq(statuses.id, id))
       .returning();
-
     return updated as Status;
   }
 
@@ -40,14 +38,21 @@ export class StatusRepository {
     await db.delete(statuses).where(eq(statuses.id, id));
   }
 
-  async existsByNameForUser(name: string, userId: string): Promise<boolean> {
+  async existsByNameForBoard(name: string, boardId: string): Promise<boolean> {
     const [status] = await db
       .select()
       .from(statuses)
-      .where(and(eq(statuses.name, name), eq(statuses.userId, userId)))
+      .where(and(eq(statuses.name, name), eq(statuses.boardId, boardId)))
       .limit(1);
-
     return !!status;
+  }
+
+  async findByBoardId(boardId: string): Promise<Status[]> {
+    const results = await db
+      .select()
+      .from(statuses)
+      .where(eq(statuses.boardId, boardId));
+    return results as Status[];
   }
 
   async findByUserId(userId: string): Promise<Status[]> {
@@ -55,7 +60,6 @@ export class StatusRepository {
       .select()
       .from(statuses)
       .where(eq(statuses.userId, userId));
-
     return results as Status[];
   }
 }
