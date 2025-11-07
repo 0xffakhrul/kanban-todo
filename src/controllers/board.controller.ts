@@ -51,4 +51,22 @@ export class BoardController {
       throw new HTTPException(500, { message: "Failed to fetch board" });
     }
   }
+
+  async getBoardsByUserId(c: Context) {
+    try {
+      const userId = c.get("userId");
+      const boards = await this.boardService.getBoardsByUserId(userId);
+
+      return c.json({
+        success: true,
+        data: boards,
+      });
+    } catch (error) {
+      if (error instanceof HTTPException) {
+        throw error;
+      }
+      console.error("Error fetching boards:", error);
+      throw new HTTPException(500, { message: "Failed to fetch boards" });
+    }
+  }
 }

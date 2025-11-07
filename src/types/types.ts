@@ -5,9 +5,18 @@ export interface User {
   createdAt: Date;
 }
 
+export interface Board {
+  id: string;
+  name: string;
+  userId: string;
+  icon: string;
+  createdAt: Date;
+}
+
 export interface Status {
   id: string;
   name: string;
+  boardId: string;
   userId: string;
   createdAt: Date;
 }
@@ -16,6 +25,7 @@ export interface Todo {
   id: string;
   title: string;
   description: string | null;
+  boardId: string;
   statusId: string;
   userId: string;
   createdAt: Date;
@@ -43,8 +53,20 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
+export interface CreateBoardInput {
+  name: string;
+  userId: string;
+  icon: string;
+}
+
+export interface UpdateBoardInput {
+  name?: string;
+  icon?: string;
+}
+
 export interface CreateStatusInput {
   name: string;
+  boardId: string;
   userId: string;
 }
 
@@ -55,6 +77,7 @@ export interface UpdateStatusInput {
 export interface CreateTodoInput {
   title: string;
   description?: string;
+  boardId: string;
   statusId: string;
   userId: string;
 }

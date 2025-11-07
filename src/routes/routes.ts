@@ -33,8 +33,8 @@ export function createBoardRoutes(
   routes.use("/*", authMiddleware);
 
   routes.post("/", (c) => boardController.createBoard(c));
+  routes.get("/", (c) => boardController.getBoardsByUserId(c)); // Move this up
   routes.get("/:id", (c) => boardController.getBoardById(c));
-
   return routes;
 }
 
